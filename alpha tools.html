@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Alpha Tools | سلة + واتساب</title>
+
+<style>
+  :root{
+    --bg:#0b0f17;
+    --text:#f3f4f6;
+    --muted:#a7b0c0;
+    --brand:#ff3b30;
+    --ring:rgba(255,255,255,.10);
+    --shadow:0 18px 50px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:Arial,sans-serif;color:var(--text);
+    background:
+      radial-gradient(900px 450px at 20% 10%, rgba(255,59,48,.18), transparent 60%),
+      radial-gradient(900px 450px at 85% 25%, rgba(0,200,255,.12), transparent 60%),
+      var(--bg);
+  }
+  .container{max-width:1100px;margin:0 auto;padding:16px}
+
+  .hero{
+    background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+    border:1px solid var(--ring);
+    border-radius:22px;
+    box-shadow:var(--shadow);
+    padding:16px;
+    display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+  }
+  .brandBox{display:flex;align-items:center;gap:12px}
+  .logo{
+    width:58px;height:58px;border-radius:18px;
+    background:linear-gradient(135deg, #ff3b30, #ff8c5a);
+    display:grid;place-items:center;
+    font-weight:900;
+    box-shadow:0 16px 30px rgba(255,59,48,.22);
+  }
+  .brandText h1{margin:0;font-size:22px}
+  .brandText p{margin:6px 0 0;color:var(--muted);font-size:13px}
+
+  .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .btn{
+    border:none;border-radius:14px;
+    padding:10px 12px;
+    cursor:pointer;
+    color:#fff;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.10);
+    transition:transform .15s ease, filter .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px);filter:brightness(1.05)}
+  .btn.primary{
+    background:linear-gradient(135deg, #ff3b30, #ff8c5a);
+    border:none;
+    box-shadow:0 12px 24px rgba(255,59,48,.20);
+  }
+  .chip{
+    display:flex;gap:8px;align-items:center;
+    padding:10px 12px;border-radius:999px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.10);
+    color:var(--text);
+  }
+  .chip a{
+    color:#fff;text-decoration:none;
+    background:rgba(255,255,255,.08);
+    padding:8px 10px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.10)
+  }
+
+  .sectionTitle{
+    margin:16px 0 10px;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  .sectionTitle h2{margin:0;font-size:18px}
+  .hint{color:var(--muted);font-size:12px}
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:12px;
+  }
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+    border:1px solid var(--ring);
+    border-radius:18px;
+    padding:14px;
+    box-shadow:0 14px 30px rgba(0,0,0,.25);
+  }
+  /* ===== Image Preview Modal ===== */
+.imgModal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  z-index:999;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.imgModal img{
+  max-width:95%;
+  max-height:90%;
+  border-radius:16px;
+  box-shadow:0 25px 60px rgba(0,0,0,.6);
+  animation: zoomIn .25s ease;
+}
+@keyframes zoomIn{
+  from{transform:scale(.85);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+.imgModal span{
+  position:absolute;
+  top:20px;
+  left:20px;
+  font-size:32px;
+  color:#fff;
+  cursor:pointer;
+}
+
+  .prodImg{
+    width:100%;
+    height:160px;
+    object-fit:cover;
+    border-radius:14px;
+    margin-bottom:10px;
+    background:#000;
+    border:1px solid rgba(255,255,255,.10);
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .prodImg:hover{
+    transform: scale(1.03);
+    box-shadow: 0 18px 40px rgba(0,0,0,.45);
+  }
+
+  .name{font-weight:800;margin:0 0 6px}
+  .cat{color:var(--muted);font-size:12px;margin:0 0 10px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .price{font-weight:900;color:#ff615a;font-size:18px}
+
+  /* Modal */
+  .modal{
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.60);
+    align-items:center;justify-content:center;
+    padding:14px;
+    z-index:50;
+  }
+  .modalBox{
+    width:96%;max-width:720px;
+    background:linear-gradient(180deg, rgba(18,27,44,.98), rgba(12,18,30,.98));
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:14px;
+    position:relative;
+  }
+  .close{
+    position:absolute;left:12px;top:10px;
+    width:40px;height:40px;border-radius:14px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.10);
+    color:#fff;font-size:18px;cursor:pointer;
+  }
+  .cartItem{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .cartItem:last-child{border-bottom:none}
+  .qty{
+    display:flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.10);
+    padding:6px 10px;border-radius:999px;
+  }
+  .qty button{
+    width:28px;height:28px;border-radius:10px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.08);
+    color:#fff;cursor:pointer;
+  }
+  .sumRow{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px solid rgba(255,255,255,.08);
+  }
+  input, textarea{
+    width:100%;
+    padding:10px 12px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.06);
+    color:#fff;
+    outline:none;
+    font-family:inherit;
+  }
+  textarea{min-height:90px;resize:vertical}
+  .formGrid{display:grid;gap:10px;margin-top:10px}
+  .small{color:var(--muted);font-size:12px;margin-top:8px;line-height:1.6}
+</style>
+</head>
+<!-- Image Modal -->
+<div class="imgModal" id="imgModal">
+  <span onclick="closeImg()">×</span>
+  <img id="imgPreview">
+</div>
+
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="brandBox">
+      <div class="logo">AT</div>
+      <div class="brandText">
+        <h1>Alpha Tools 🛠️</h1>
+        <p>منتجات + سلة + إرسال الطلب إلى واتساب</p>
+        <p3>توصيل لجميع محافظات 5 الف</p3>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="chip">
+        <span>📞</span>
+        <b id="shopPhoneText">07731614461</b>
+        <a id="callBtn" href="tel:07731614461">اتصال</a>
+      </div>
+
+      <button class="btn primary" id="cartBtn">🛒 السلة (<span id="count">0</span>)</button>
+    </div>
+  </div>
+
+  <div class="sectionTitle">
+    <h2>🧰 المنتجات</h2>
+    <div class="hint">اضغط "إضافة للسلة" — الصور محلية داخل مجلد images</div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+</div>
+
+<!-- Cart Modal -->
+<div class="modal" id="cartModal">
+  <div class="modalBox">
+    <button class="close" id="closeCart">×</button>
+    <h2 style="margin:0 0 6px;">🧾 سلة الشراء</h2>
+
+    <div id="cartItems"></div>
+
+    <div class="sumRow">
+      <b>المجموع: <span id="total">0</span> د.ع</b>
+      <button class="btn" id="clearBtn">تفريغ السلة</button>
+    </div>
+
+    <div class="formGrid">
+      <input id="customerPhone" placeholder="📞 رقم هاتف الزبون" />
+      <textarea id="customerAddress" placeholder="📍 العنوان الكامل"></textarea>
+
+      <button class="btn primary" id="sendWhatsBtn">💬 إرسال الطلب للواتساب</button>
+
+      <div class="small">
+        ✅ راح يفتح واتساب والطلب مكتوب جاهز للإرسال.<br>
+        إذا أنت تفتح الملف من الكمبيوتر: راح يفتح WhatsApp Web.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== إعدادات =====
+  const SHOP_PHONE_LOCAL = "07731614461";       // يظهر بالموقع
+  const WA_NUMBER = "9647731614461";            // رقم واتساب مال المتجر (بدون +)
+
+  document.getElementById("shopPhoneText").textContent = SHOP_PHONE_LOCAL;
+  document.getElementById("callBtn").href = `tel:${SHOP_PHONE_LOCAL}`;
+
+  // ===== المنتجات (حط صورك داخل images جنب index.html) =====
+  // مثال: images/p1.jpg
+  const products = [
+    { id:72, name:"سيت براين فرطونة اصلي ابو بوكس رقم المنتج 72", cat:" ", priceIQD:15000, img:"imag2/42.jpg" },
+    { id:73, name:"منكنة حجم صغير للادوات صياغة و الفنيين رقم المنتج 73", cat:"معدات مخارط", priceIQD:10000, img:"imag2/43.jpg" },
+    { id:74, name:"برينة خشبي لعمل ثقب كبير رقم المنتج 74", cat:"معدات مخارط", priceIQD:10000, img:"imag2/44.jpg" },
+    { id:75, name:"سيت اقراس الماس فرطونة ابو بوكس ذهبي رقم المنتج 75", cat:"معدات مخارط", priceIQD:12000, img:"imag2/45.jpg" },
+    { id:76, name:"سيت براين خشب امباكت رقم المنتج 76", cat:"معدات مخارط", priceIQD:6000, img:"imag2/46.jpg" },
+    { id:77, name:"تورنة حجم صغير رقم المنتج 77", cat:"معدات مخارط", priceIQD:50000, img:"imag2/47.jpg" },
+    { id:78, name:"منشار اصلي لولبي مع تيغ 12 قطعة رقم المنتج 78", cat:"", priceIQD:25000, img:"imag2/48؟.webp" },
+    { id:79, name:"مطرقة مطاطي  اصلي حجم 30 ملم رقم المنتج 79", cat:"معدات مخارط", priceIQD:6000, img:"imag2/49.jpg" },
+    { id:80, name:"مطرقة مطاطي اصلي حجم 35ملم رقم المنتج 80", cat:"معدات مخارط", priceIQD:7000, img:"imag2/49.jpg" },
+    { id:81, name:"ادات محدادة براين مع 2 حجر رقم المنتج 81", cat:"معدات مخارط", priceIQD:6000, img:"imag2/50.jpg" },
+    { id:82, name:"سيت عدة تصليح ساعات الاصلي رقم المنتج 82", cat:"معدات مخارط", priceIQD:15000, img:"imag2/51.jpg" },
+    { id:83, name:"سيت براغي مخفي للخشب رقم المنتج 83", cat:"معدات مخارط", priceIQD:10000, img:"imag2/52.jpg" },
+    { id:84, name:"سيت برينة خشب ذهبي رقم المنتج 84", cat:"معدات مخارط", priceIQD:8000, img:"imag2/53.jpg" },
+    { id:85, name:"سيت من مسدس و صوندة كومبريسر مع نوزلات رقم المنتج 85", cat:"معدات مخارط", priceIQD:15000, img:"imag2/54.jpg" },
+    { id:86, name:"بلايس دوشمة مع 25000 كلبس رقم المنتج 86", cat:"معدات مخارط", priceIQD:30000, img:"imag2/55.jpg" },
+    { id:87, name:"سيت براين الماس مدور اصلي رقم المنتج 87", cat:"معدات مخارط", priceIQD:18000, img:"imag2/56.jpg" },
+    { id:88, name:"سيت براين خشبي للزغرفة رقم المنتج 88", cat:"معدات مخارط", priceIQD:6000, img:"imag2/57.jpg" },
+    { id:89, name:"سيت شفرات موس اصلي رقم المنتج 89", cat:"معدات مخارط", priceIQD:7000, img:"imag2/58.jpg" },
+    { id:90, name:"اي بوكسي اصلي جوكر رقم المنتج 90", cat:"معدات مخارط", priceIQD:4000, img:"imag2/59.jpg" },
+    { id:91, name:"كبان صغير من شركة ديلي اصلي رقم المنتج 91", cat:"معدات مخارط", priceIQD:7000, img:"imag2/60.jpg" },
+    { id:92, name:"مغناطيس بوكس مثقوب  قطعة رقم المنتج 92", cat:"معدات مخارط", priceIQD:1000, img:"imag2/61.jpg" },
+    { id:93, name:"مغناطيس  قطعة رقم المنتج 93", cat:"معدات مخارط", priceIQD:250, img:"imag2/62.jpg" },
+    { id:94, name:"كاوية فلين متغير سرعات اصلي رقم المنتج 94", cat:"معدات مخارط", priceIQD:14000, img:"imag2/63.jpg" },
+    { id:95, name:"منشار يدوي لولبي صغير مع تيغ رقم المنتج 95", cat:"معدات مخارط", priceIQD:13000, img:"imag2/64.jpg" },
+    { id:96, name:"منشار يدوي لولبي كبير مع تيغ رقم المنتج 96", cat:"معدات مخارط", priceIQD:15000, img:"imag2/65.jpg" },
+    { id:97, name:"سيت كاوية فلين متغير درجات رقم المنتج 97", cat:"معدات مخارط", priceIQD:40000, img:"imag2/66.jpg" },
+    { id:98, name:"سيت ضربات فريزة تعشيق بوش 8 ملم رقم المنتج 98", cat:"معدات مخارط", priceIQD:15000, img:"imag2/67.jpg" },
+    { id:99, name:"راجز لقمة عزم 28 الى 210 العزم رقم المنتج 99", cat:"معدات مخارط", priceIQD:30000, img:"imag2/68.jpg" },
+    { id:100, name:"راجز عزم صغير من 5 الى 70 نيوتن رقم المنتج 100", cat:"معدات مخارط", priceIQD:25000, img:"imag2/69.jpg" },
+    { id:101, name:"سيت فخة بلبرينك للدراجة و للسيارة 12 قطعة اصلي رقم المنتج 101", cat:"معدات مخارط", priceIQD:20000, img:"imag2/70.jpg" },
+    { id:102, name:"يدة عزم راجز من 70 الى 350 نيوتن رقم المنتج 102", cat:"معدات مخارط", priceIQD:50000, img:"imag2/71.jpg" },
+    { id:103, name:"فرطونة صناعي اصلي  ماطور رقم المنتج 103", cat:"معدات مخارط", priceIQD:75000, img:"imag2/72.jpg" },
+    { id:104, name:"سيت براين الماس 7 قطعة رقم المنتج 104", cat:"معدات مخارط", priceIQD:5000, img:"imag2/73.jpg" },
+    { id:105, name:"راجز صغير الحجم رقم المنتج 105", cat:"معدات مخارط", priceIQD:5000, img:"imag2/74.jpg" },
+    { id:106, name:"قاعدة كوسرة محدادة براين رقم المنتج 106", cat:"معدات مخارط", priceIQD:4000, img:"imag2/75.jpg" },
+    { id:107, name:"واكس خشبي للخرزات للتلميع و حماية الخشب  رقم المنتج 107", cat:"معدات مخارط", priceIQD:5000, img:"imag2/76.jpg" },
+    { id:108, name:"بوش ماطور 8/10/5ملم رقم المنتج 108", cat:"معدات مخارط", priceIQD:7000, img:"imag2/77.jpg" },
+    { id:109, name:"بوشة كوسرة 14 ملم مع راس 100ملم رقم المنتج 109", cat:"معدات مخارط", priceIQD:8000, img:"imag2/78.jpg" },
+    { id:110, name:"سيت براين تورنة خشب رقم المنتج 110", cat:"معدات مخارط", priceIQD:7000, img:"imag2/79.jpg" },
+    { id:111, name:"لبلوب خشب حجم 10 ملم رقم المنتج 111", cat:"معدات مخارط", priceIQD:5000, img:"imag2/80.jpg" },
+    { id:112, name:"لبلوب خشب 8 ملم رقم المنتج 112", cat:"معدات مخارط", priceIQD:5000, img:"imag2/80.jpg" },
+    { id:113, name:"لبلوب خشب 6 ملم رقم المنتج 113", cat:"معدات مخارط", priceIQD:5000, img:"imag2/80.jpg" },
+    { id:114, name:"ازميل خشب سيت 12 قطعة رقم المنتج 114", cat:"معدات مخارط", priceIQD:20000, img:"imag2/81.jpg" },
+    { id:115, name:"ازميل الخشب صغير اصلي رقم المنتج 115", cat:"معدات مخارط", priceIQD:8000, img:"imag2/82.jpg" },
+    { id:116, name:"قاعدة لبلوب مع سيت من لبلوب و برينة رقم المنتج 116", cat:"معدات مخارط", priceIQD:10000, img:"imag2/83.jpg" },
+    { id:117, name:"مسدس الماس للزجاج و كاشي رقم المنتج 117", cat:"معدات مخارط", priceIQD:15000, img:"imag2/84.jpg" },
+    { id:118, name:"كاوية نقطي ابو شاشة رقم المنتج 118", cat:"معدات مخارط", priceIQD:50000, img:"imag2/85.jpg" },
+    { id:119, name:"سيت براين كاربت اصلي رقم المنتج 119", cat:"معدات مخارط", priceIQD:15000, img:"imag2/86.jpg" },
+    { id:120, name:"سيت ازميل مقوس لعمل حلقات جوكر رقم المنتج 120", cat:"معدات مخارط", priceIQD:18000, img:"imag2/87.jpg" },
+    { id:121, name:"ماطور سحب دهن سيارة و ماطور 12 فولت رقم المنتج 121", cat:"معدات مخارط", priceIQD:20000, img:"imag2/88.jpg" },
+    { id:122, name:"سويج مكائن رقم المنتج 122", cat:"معدات مخارط", priceIQD:5000, img:"imag2/89.jpg" },
+    { id:123, name:"قناع فلتر كميائي اصلي رقم المنتج123", cat:"معدات مخارط", priceIQD:20000, img:"imag2/90.jpg" },
+    { id:124, name:"مطرقة نجارة اصلي رقك المنتج 124", cat:"معدات مخارط", priceIQD:15000, img:"imag2/91.jpg" },
+    { id:125, name:"تحويلة منشار تشريح ثابت رقم المنتج 125", cat:"معدات مخارط", priceIQD:35000, img:"imag2/92.jpg" },
+    { id:126, name:"مسدس تونك برجم حجم كبير رقم المنتج 126", cat:"معدات مخارط", priceIQD:50000, img:"imag2/93.jpg" },
+    { id:127, name:"تحويلة 90 درجة نوع اصلي  رقم المنتج 127", cat:"معدات مخارط", priceIQD:15000, img:"imag2/94.jpg" },
+    { id:128, name:"جهاز جوكر لقطع و حفر لعمل خرزات و الحجر مع قامجي رقم المنتج128", cat:"معدات مخارط", priceIQD:145000, img:"imag2/95.jpg" },
+    { id:129, name:"سيت قلاوز اصلي رقم المنتج 129", cat:"معدات مخارط", priceIQD:12000, img:"imag2/96.jpg" },
+    { id:130, name:"سيت قلاوز صيني رقم المنتج 130", cat:"معدات مخارط", priceIQD:10000, img:"imag2/97.jpg" },
+    { id:131, name:"درنفيس براين للمسك خرزة رقم المنتج 131", cat:"معدات مخارط", priceIQD:10000, img:"imag2/98.jpg" },
+    { id:132, name:"قامجي فرطونة 6 ملم رقم المنتج 132", cat:"معدات مخارط", priceIQD:20000, img:"imag2/99.jpg" },
+    { id:133, name:"يدة فرطونة ابو قفل رقم المنتج 133", cat:"معدات مخارط", priceIQD:18000, img:"imag2/100.jpg" },
+    { id:134, name:"ايزي اوت للبراغي سيت اصلي رقم المنتج 134", cat:"معدات مخارط", priceIQD:7000, img:"imag2/101.jpg" },
+    { id:135, name:"اداة ازالة حواف نحاس و حديد و بلاستك رقم المنتج 135", cat:"معدات مخارط", priceIQD:7000, img:"imag2/102.jpg" },
+    { id:136, name:"تطوالة كوسرة 3 قطعة رقم المنتج 136", cat:"معدات مخارط", priceIQD:12000, img:"imag2/103.jpg" },
+    { id:137, name:"بم سحب دهن حجم كبير 500 سيس رقم المنتج 137", cat:"معدات مخارط", priceIQD:10000, img:"imag2/104.jpg" },
+    { id:138, name:"يدة هواى فرطونة اصلي جدا رقم المنتج 138", cat:"معدات مخارط", priceIQD:30000, img:"imag2/105.jpg" },
+    { id:139, name:"واكس ياباني للحواف و تلميع للجلود رقم المنتج 139", cat:"معدات مخارط", priceIQD:20000, img:"imag2/106.jpg" },
+   
+   
+   
+    { id:59, name:"قاعدة لبلوب اصلي رقم المنتج 59", cat:"معدات مخارط", priceIQD:50000, img:"imag2/31.jfif" },
+    { id:60, name:"قاشطة اسلاك 3 قطعة رم المنتج 60", cat:"معدات مخارط", priceIQD:17000, img:"imag2/32.jfif" },
+    { id:61, name:"سيت براين الماس لولبي رقم المنتج 61", cat:"معدات مخارط", priceIQD:10000, img:"imag2/33.jfif" },
+    { id:62, name:"كوسرة صغير شحن رقم المنتج62", cat:"معدات مخارط", priceIQD:25000, img:"imag2/34.jfif" },
+    { id:63, name:"سيت مبرد جوكر رم المنتج 63", cat:"معدات مخارط", priceIQD:20000, img:"imag2/35.jfif" },
+    { id:64, name:"قاعدة مع برينة نرمادة رقم المنتج 64", cat:"معدات مخارط", priceIQD:8000, img:"imag2/36.jfif" },
+    { id:65, name:"كونية مثلث اصلي 7 انج رم المنتج 65", cat:"معدات مخارط", priceIQD:10000, img:"imag2/37.jfif" },
+    { id:66, name:"قلم تاشير جوكر رقم المنتج 66", cat:"معدات مخارط", priceIQD:10000, img:"imag2/38.jfif" },
+    { id:67, name:"مسدس رمل اصلي رم المنتج 67", cat:"معدات مخارط", priceIQD:30000, img:"imag2/39.jfif" },
+    { id:68, name:"سيت سنفرة قاغد جام رقم المنتج 68", cat:"معدات مخارط", priceIQD:13000, img:"imag2/40.jfif" },
+    { id:69, name:"سيت اقراص الماس كبير رقم المنتج 69", cat:"معدات مخارط", priceIQD:15000, img:"imag2/41.jfif" },
+    { id:70, name:"سيت اقراص الماس وسط رقم المنتج 70", cat:"معدات مخارط", priceIQD:12000, img:"imag2/41.jfif" },
+    { id:71, name:"سيت اقراص الماس صغير رقم المنتج 71", cat:"معدات مخارط", priceIQD:10000, img:"imag2/41.jfif" },
+    { id:1, name:"سيت براين فرطونة 30 قطعة منتج رقم 1", cat:"معدات نقش وطحن", priceIQD:6000, img:"imag/74c401b1-4e98-4346-b1ae-3ba8f82bbeca.jfif" },
+    { id:2, name:"طقم رؤوس نقش دقيقة منتج رقم2 2.35mm ", cat:"معدات نقش", priceIQD:12000, img:"imag/d7879fc9-b5f1-4a10-b30b-f161bd48c1c5.jfif" },
+    { id:3, name:"براين كاربت الماني  اصلي منتج رقم 3", cat:"عدد يدوية", priceIQD:10000, img:"imag/544786062_766118786177425_4971700363263517477_n.jpg" },
+    { id:4, name:"برينة الماس اصلي منتج رقم 4", cat:"معدات ميكانيك", priceIQD:6000, img:"imag/912faefd-4f75-49e4-9ecf-5fc259de4098.jfif" },
+    { id:5, name:"سيت اقراص فرطونة للتلميع منتج رقم 5", cat:"معدات مخارط", priceIQD:12000, img:"imag/2f8b3bf8-8162-4c64-aa33-8a4aed117563.jfif" },
+    { id:6, name:"سيت ادوات صياغة بلاستك رقم منتج 6", cat:"معدات مخارط", priceIQD:7000, img:"imag/4c7b15ab-32a1-4ac6-83bc-64390a27cd40.jfif" },
+    { id:7, name:"براين كاربت الماني اصلي ذهبي رقم المنتج 7", cat:"معدات مخارط", priceIQD:13000, img:"imag/5f4192ce-307f-481e-ad88-440f6bf8b066.jfif" },
+    { id:8, name:"شعلة غاز اصلي رقم المنتج 8", cat:"معدات مخارط", priceIQD:10000, img:"imag/63cfa1d9-8315-4c0a-8944-f568891620c1.jfif" },
+    { id:9, name:"سائل تنضيف و تلميع مجوهرات امريكي رقم المنتج 9", cat:"معدات مخارط", priceIQD:15000, img:"imag/85aa061b-1adb-45cc-bfdb-65bb0268b2d0.jfif" },
+    { id:10, name:"براين الماس طويل الحجم رقم منتج 10", cat:"معدات مخارط", priceIQD:6000, img:"imag/93d6951e-d91e-4997-9e53-a5f6448918e6.jfif" },
+    { id:11, name:"مطرقة امريكي حجم صغير رقم المنتج 11", cat:"معدات مخارط", priceIQD:13000, img:"imag/476d4648-6efe-42fb-995a-99d1e7bd40c3.jfif" },
+    { id:12, name:"مكبر للمجوهرات  رقم المنتج 12", cat:"معدات مخارط", priceIQD:10000, img:"imag/1675a66b-c9b3-4c09-9ed6-4c9f5ab09f28.jfif" },
+    { id:13, name:"ادات تصلي سوارة استيل رقم المنتج 13", cat:"معدات مخارط", priceIQD:18000, img:"imag/5045fa63-97c6-4e00-9f04-42f3ee9425e5.jfif" },
+    { id:14, name:"مطرقة امريكي اصلي رقم المنتج 14", cat:"معدات مخارط", priceIQD:13000, img:"imag/5708c0e9-dc96-423a-b8d9-93037a1048c2.jfif" },
+    { id:15, name:"جهاز فحص مجوهرات رقم المنتج 15", cat:"معدات مخارط", priceIQD:15000, img:"imag/52877f0c-af61-4737-b483-a5b2dd5cf5a8.jfif" },
+    { id:16, name:"سيت احجار للتلميع جميع المواد رقم المنتج 16", cat:"معدات مخارط", priceIQD:18000, img:"imag/44950488-4a49-4121-b84f-ebfee8b39205.jfif" },
+    { id:17, name:"ادوات مقياس صياغة المنيوم رقم المنتج 17", cat:"معدات مخارط", priceIQD:10000, img:"imag/d6285fed-3f53-40de-a29a-31d419fda993.jfif" },
+    { id:18, name:"براين ذهبي اصلي للعمل خرزة رقم المنتج 18", cat:"معدات مخارط", priceIQD:8000, img:"imag/e967d545-d3ac-419f-a518-743480b7d8eb.jfif" },
+    { id:19, name:"سيت بلاستيك فواصل خاتم رقم المنتج 19", cat:"معدات مخارط", priceIQD:2000, img:"imag/ee06e5bb-56d3-4fff-bdf1-85515432eedd.jfif" },
+    { id:20, name:"سيت اقراص فرطونة للتنضيف و تلميع رمق المنتج 20", cat:"معدات مخارط", priceIQD:15000, img:"imag/1.jfif" },
+    { id:21, name:"سيت شفرات فولاذ صلب اصلي رقم المنتج 21", cat:"معدات مخارط", priceIQD:20000, img:"imag/2.jfif" },
+    { id:22, name:"سيت بنطة للنقش على ذهب و فضة رقم المنتج 22", cat:"معدات مخارط", priceIQD:20000, img:"imag/11.jfif" },
+    { id:23, name:"بلايس صياغة لعمل حلقات رقم المنتج 23", cat:"معدات مخارط", priceIQD:13000, img:"imag/12.jfif" },
+    { id:24, name:"تورج امريكي 5 رووس رقم المنتج 24", cat:"معدات مخارط", priceIQD:25000, img:"imag/111.jfif" },
+    { id:25, name:"جهاز بوليش رقم المنتج 25", cat:"معدات مخارط", priceIQD:190000, img:"imag/222.jfif" },
+    { id:26, name:"تورج صياغة امريكي لبة طويل رقم المنتج 26", cat:"معدات مخارط", priceIQD:30000, img:"imag/1111.jfif" },
+    { id:27, name:"هيت كان مع كاوية منتج رقو 27", cat:"معدات مخارط", priceIQD:45000, img:"imag2/1.jfif" },
+    { id:28, name:"فرطونة كهربائي كازوبر رم المنج28", cat:"معدات مخارط", priceIQD:35000, img:"imag2/2.jfif" },
+    { id:29, name:"تيغ لولبي اصلي رقم المنتج 29", cat:"معدات مخارط", priceIQD:7000, img:"imag2/3.jfif" },
+    { id:30, name:"فلير بواري نحاس رقم النتج 30", cat:"معدات مخارط", priceIQD:10000, img:"imag2/4.jfif" },
+    { id:31, name:"عينة تورنا رباعي المنيوم رقم المنتج 31", cat:"معدات مخارط", priceIQD:35000, img:"imag2/5.jfif" },
+    { id:32, name:"عينة تورنة ثلاثي رم المنتج 32", cat:"معدات مخارط", priceIQD:30000, img:"imag2/6.jfif" },
+    { id:33, name:"فيرنيا  150 ملم رقم المنتج 33", cat:"معدات مخارط", priceIQD:5000, img:"imag2/7.jfif" },
+    { id:34, name:"قلاوز سن داخلي للبواري بلاستك رقم المنتج 34", cat:"معدات مخارط", priceIQD:2000, img:"imag2/8.jfif" },
+    { id:35, name:"سيت من براين خشبي معا بنطة رقم المنتج 35", cat:"معدات مخارط", priceIQD:12000, img:"imag2/9.jfif" },
+    { id:36, name:"ادات فتح قفل دريل رقم المنتج 36", cat:"معدات مخارط", priceIQD:7000, img:"imag2/10.jfif" },
+    { id:37, name:"سيت لقم طويل رقم المنتج 37", cat:"معدات مخارط", priceIQD:20000, img:"imag2/11.jfif" },
+    { id:38, name:"فرطونة شحن ياباني رقم المنتج 38", cat:"معدات مخارط", priceIQD:35000, img:"imag2/12.jfif" },
+    { id:39, name:"سيت صامولات اسلاك رقم المنتج 39", cat:"معدات مخارط", priceIQD:10000, img:"imag2/13.jfif" },
+    { id:40, name:"سيت من ضربات فريزةرقم المنتج40", cat:"معدات مخارط", priceIQD:20000, img:"imag2/14.jfif" },
+    { id:41, name:"منشار تيغ للخشب رقم المنتج41", cat:"معدات مخارط", priceIQD:4000, img:"imag2/15.jfif" },
+    { id:42, name:"سيت سكويرات الماس اصلي رم المنتج 42", cat:"معدات مخارط", priceIQD:20000, img:"imag2/16.jfif" },
+    { id:43, name:"سيت براين الماس مع برينة رقم المنتج 43", cat:"معدات مخارط", priceIQD:10000, img:"imag2/17.jfif" },
+    { id:44, name:"44سيت لقم راس طويل رقم المنتج", cat:"معدات مخارط", priceIQD:20000, img:"imag2/18.jpg" },
+    { id:45, name:"سيت براين كاربت ناعم جدا من 0.1ملم الى1رقم المنتج 45", cat:"معدات مخارط", priceIQD:6000, img:"imag2/19.jfif" },
+    { id:46, name:"سيت براين كاربت ناعم جدا من 0.6ملم الى1.5رقم المنتج46", cat:"معدات مخارط", priceIQD:8000, img:"imag2/19.jfif" },
+    { id:47, name:"سيت براين كاربت ناعم جدا من 1.5ملم الى 2.4رقم المنتج 47", cat:"معدات مخارط", priceIQD:10000, img:"imag2/19.jfif" },
+    { id:48, name:"سيت اقراص بوليش رقم المنتج 48", cat:"معدات مخارط", priceIQD: 0, img:"imag2/20.jfif" },
+    { id:49, name:"سيت براين الماس فولاذ رقم المنتج 49", cat:"معدات مخارط", priceIQD:10000, img:"imag2/21.jfif" },
+    { id:50, name:"50شعلة حراري  قوي جدا رقم المنتج ", cat:"معدات مخارط", priceIQD:10000, img:"imag2/22.jfif" },
+    { id:51, name:"سيت قلاوز سن خارجي للبواري بلاستك رقم المنتج 51", cat:"معدات مخارط", priceIQD:4000, img:"imag2/23.jfif" },
+    { id:52, name:"ادات عمل كرات خشبية رقم المنتج 52", cat:"معدات مخارط", priceIQD:25000, img:"imag2/24.jfif" },
+    { id:53, name:"فرطونة كهربائي صاروغي اصليرقم المنتج 53", cat:"معدات مخارط", priceIQD:25000, img:"imag2/25.jfif" },
+    { id:54, name:"سيت قاغد جام حجم 1 انج رقم المنتج 54", cat:"معدات مخارط", priceIQD:8000, img:"imag2/26.jfif" },
+    { id:55, name:"وينج سحب قوي جدا رقم المنتج 55", cat:"معدات مخارط", priceIQD:20000, img:"imag2/27.jfif" },
+    { id:56, name:"كونية مسطرة نادرة اصلي رقم المنتج 56", cat:"معدات مخارط", priceIQD:7000, img:"imag2/28.jfif" },
+    { id:57, name:"كونية مسطرة صغير مثلث رقم المنتج57", cat:"معدات مخارط", priceIQD:10000, img:"imag2/29.jfif" },
+    { id:58, name:"سيت براين فرطونة الماس رقم المنتج 58", cat:"معدات مخارط", priceIQD:7000, img:"imag2/30.jfif" },
+  
+    { id:140, name:"سيت من اقراص تلميع الاحجار و رخام و كاشي رقم المنتج 140", cat:"معدات نجارة", priceIQD:20000, img:"imag2/107.jpg" },
+    { id:141, name:"تحويل دريل الى كوسرة 100ملم رقم المنتج 141", cat:"معدات نجارة", priceIQD:5000, img:"imag2/108.jpg" },
+    { id:142, name:"اقراص تلميع الاحجار و الصقل رقم النتج142", cat:"معدات نجارة", priceIQD:7000, img:"imag2/109.jpg" },
+    { id:143, name:"سيت رولة ضغط مفاصل رقم المنتج 143", cat:"معدات نجارة", priceIQD:10000, img:"imag2/110.jpg" },
+    { id:144, name:"اير برش الاصلي يعمل مع كمبريسر هوى رقم المنتج 144", cat:"معدات نجارة", priceIQD:50000, img:"imag2/111.jpg" },
+    { id:145, name:"مسدس تكحيل رقم المنتج 145", cat:"معدات نجارة", priceIQD:40000, img:"imag2/112.jpg" },
+    { id:146, name:"تحويلة تونك برجم من 3 الى 8 ملم رقم المنتج 146", cat:"معدات نجارة", priceIQD:35000, img:"imag2/113.jpg" },
+    { id:147, name:"انتيركوم ايطالي صمغ جلود رقم المنتج 147", cat:"معدات نجارة", priceIQD:12000, img:"imag2/114.jpg" },
+    { id:148, name:"كاوية حرق على خشب 100 واط رقم المنتج 148", cat:"معدات نجارة", priceIQD:50000, img:"imag2/115.jpg" },
+    { id:149, name:"كتر موس جوكر رقم المنتج 149", cat:"معدات نجارة", priceIQD:2000, img:"imag2/116.jpg" },
+    { id:150, name:"كوسرة منضدي جوكر اصلي رقم النتج 150", cat:"معدات نجارة", priceIQD:125000, img:"imag2/117.jpg" },
+    
+    
+  ];
+
+  // ===== حالة السلة =====
+  // نخزن: {id, qty}
+  let cart = [];
+
+  // ===== عناصر DOM =====
+  const grid = document.getElementById("grid");
+  const countEl = document.getElementById("count");
+  const cartBtn = document.getElementById("cartBtn");
+
+  const cartModal = document.getElementById("cartModal");
+  const closeCart = document.getElementById("closeCart");
+  const cartItems = document.getElementById("cartItems");
+  const totalEl = document.getElementById("total");
+  const clearBtn = document.getElementById("clearBtn");
+  const sendWhatsBtn = document.getElementById("sendWhatsBtn");
+
+  const fmt = (n) => Number(n||0).toLocaleString("ar-IQ");
+
+  // ===== رسم المنتجات =====
+  function renderProducts(){
+  grid.innerHTML = "";
+  products.forEach(p=>{
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <img src="${p.img}"
+           class="prodImg"
+           alt="${p.name}"
+           onclick="openImg('${p.img}')"
+           onerror="this.onerror=null;this.src='images/placeholder.jpg';">
+
+      <p class="name">✨ ${p.name}</p>
+      <p class="cat">🏷️ ${p.cat}</p>
+
+      <div class="row">
+        <div class="price">${fmt(p.priceIQD)} د.ع</div>
+        <button class="btn primary" data-add="${p.id}">➕ إضافة للسلة</button>
+      </div>
+    `;
+    grid.appendChild(div);
+  });
+}
+  
+
+  // ===== أدوات السلة =====
+  
+  function cartCount(){
+    return cart.reduce((sum, x)=> sum + x.qty, 0);
+  }
+
+  function updateBadge(){
+    countEl.textContent = cartCount();
+  }
+
+  function addToCart(id){
+    const item = cart.find(x=>x.id===id);
+    if(item) item.qty += 1;
+    else cart.push({id, qty:1});
+    updateBadge();
+
+    // إذا السلة مفتوحة حدثها
+    if(cartModal.style.display === "flex") renderCart();
+  }
+
+  function decQty(id){
+    const item = cart.find(x=>x.id===id);
+    if(!item) return;
+    item.qty -= 1;
+    if(item.qty <= 0) cart = cart.filter(x=>x.id!==id);
+    updateBadge();
+    renderCart();
+  }
+
+  function incQty(id){
+    const item = cart.find(x=>x.id===id);
+    if(!item) return;
+    item.qty += 1;
+    updateBadge();
+    renderCart();
+  }
+
+  function removeFromCart(id){
+    cart = cart.filter(x=>x.id!==id);
+    updateBadge();
+    renderCart();
+  }
+
+  function calcTotal(){
+    let total = 0;
+    cart.forEach(ci=>{
+      const p = products.find(x=>x.id===ci.id);
+      if(p) total += (p.priceIQD * ci.qty);
+    });
+    return total;
+  }
+
+  function renderCart(){
+    cartItems.innerHTML = "";
+
+    if(cart.length === 0){
+      cartItems.innerHTML = `<div style="color:var(--muted);padding:10px 0;">السلة فارغة</div>`;
+      totalEl.textContent = "0";
+      return;
+    }
+
+    cart.forEach(ci=>{
+      const p = products.find(x=>x.id===ci.id);
+      if(!p) return;
+
+      const lineTotal = p.priceIQD * ci.qty;
+
+      const row = document.createElement("div");
+      row.className = "cartItem";
+      row.innerHTML = `
+        <div>
+          <div style="font-weight:800">${p.name}</div>
+          <div style="color:var(--muted);font-size:12px;margin-top:4px">
+            ${fmt(p.priceIQD)} د.ع × ${ci.qty} = ${fmt(lineTotal)} د.ع
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="qty">
+            <button data-dec="${p.id}">-</button>
+            <b>${ci.qty}</b>
+            <button data-inc="${p.id}">+</button>
+          </div>
+          <button class="btn" data-del="${p.id}">حذف</button>
+        </div>
+      `;
+      cartItems.appendChild(row);
+    });
+
+    totalEl.textContent = fmt(calcTotal());
+  }
+
+  // ===== إرسال للواتساب =====
+  function sendToWhatsApp(){
+    if(cart.length === 0){
+      alert("السلة فارغة");
+      return;
+    }
+
+    const customerPhone = document.getElementById("customerPhone").value.trim();
+    const customerAddress = document.getElementById("customerAddress").value.trim();
+
+    if(!customerPhone || !customerAddress){
+      alert("اكتب رقم الهاتف والعنوان");
+      return;
+    }
+
+    let msg = "🧾 طلب Alpha Tools\n";
+    msg += "----------------------\n";
+
+    cart.forEach((ci, i)=>{
+      const p = products.find(x=>x.id===ci.id);
+      if(!p) return;
+
+      const lineTotal = p.priceIQD * ci.qty;
+      msg += `${i+1}) ${p.name}\n`;
+      msg +=` الكمية: ${ci.qty}\n`;
+      msg +=` السعر: ${fmt(p.priceIQD)} د.ع\n`;
+      msg +=` المجموع: ${fmt(lineTotal)} د.ع\n`;
+      msg += "----------------------\n";
+    });
+
+    msg +=`\n✅ المجموع الكلي: ${fmt(calcTotal())} د.ع\n`;
+    msg += `📞 رقم الزبون: ${customerPhone}\n`;
+    msg += `📍 العنوان: ${customerAddress}\n`;
+    msg += `📞 رقم المتجر: ${SHOP_PHONE_LOCAL}\n`;
+
+    const encoded = encodeURIComponent(msg);
+
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const url = isMobile
+      ? `https://wa.me/${WA_NUMBER}?text=${encoded}`
+      :`https://web.whatsapp.com/send?phone=${WA_NUMBER}&text=${encoded}`;
+
+    window.open(url, "_blank");
+  }
+
+  // ===== أحداث =====
+  grid.addEventListener("click", (e)=>{
+    const add = e.target.closest("[data-add]");
+    if(add) addToCart(Number(add.dataset.add));
+  });
+
+  cartBtn.onclick = ()=>{
+    cartModal.style.display = "flex";
+    renderCart();
+  };
+  closeCart.onclick = ()=> cartModal.style.display = "none";
+  cartModal.onclick = (e)=>{ if(e.target===cartModal) cartModal.style.display="none"; };
+
+  cartItems.addEventListener("click", (e)=>{
+    const dec = e.target.closest("[data-dec]");
+    const inc = e.target.closest("[data-inc]");
+    const del = e.target.closest("[data-del]");
+
+    if(dec) decQty(Number(dec.dataset.dec));
+    if(inc) incQty(Number(inc.dataset.inc));
+    if(del) removeFromCart(Number(del.dataset.del));
+  });
+
+  clearBtn.onclick = ()=>{
+    cart = [];
+    updateBadge();
+    renderCart();
+  };
+
+  sendWhatsBtn.onclick = sendToWhatsApp;
+
+  // init
+  renderProducts();
+  updateBadge();
+  function openImg(src){
+  document.getElementById("imgPreview").src = src;
+  document.getElementById("imgModal").style.display = "flex";
+}
+function closeImg(){
+  document.getElementById("imgModal").style.display = "none";
+}
+</script>
+</body>
+</html>
